@@ -1,0 +1,13 @@
+/home/nacken/ojaaho-6/S0006D - AI/build/CMakeFiles/rebuild_cache.dir
+/home/nacken/ojaaho-6/S0006D - AI/build/CMakeFiles/edit_cache.dir
+/home/nacken/ojaaho-6/S0006D - AI/build/CMakeFiles/package.dir
+/home/nacken/ojaaho-6/S0006D - AI/build/CMakeFiles/package_source.dir
+/home/nacken/ojaaho-6/S0006D - AI/build/AI/CMakeFiles/rebuild_cache.dir
+/home/nacken/ojaaho-6/S0006D - AI/build/AI/CMakeFiles/edit_cache.dir
+/home/nacken/ojaaho-6/S0006D - AI/build/AI/CMakeFiles/package.dir
+/home/nacken/ojaaho-6/S0006D - AI/build/AI/CMakeFiles/package_source.dir
+/home/nacken/ojaaho-6/S0006D - AI/build/AI/AI/CMakeFiles/rebuild_cache.dir
+/home/nacken/ojaaho-6/S0006D - AI/build/AI/AI/CMakeFiles/edit_cache.dir
+/home/nacken/ojaaho-6/S0006D - AI/build/AI/AI/CMakeFiles/package_source.dir
+/home/nacken/ojaaho-6/S0006D - AI/build/AI/AI/CMakeFiles/AI.dir
+/home/nacken/ojaaho-6/S0006D - AI/build/AI/AI/CMakeFiles/package.dir
