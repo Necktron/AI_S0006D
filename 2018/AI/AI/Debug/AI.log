@@ -1,18 +1,5 @@
-﻿  main.cpp
-d:\svn folder\s0006d - ai\ai\ai\ai.h(63): warning C4244: '+=': conversion from 'float' to 'int', possible loss of data
-d:\svn folder\s0006d - ai\ai\ai\ai.h(84): warning C4244: '+=': conversion from 'float' to 'int', possible loss of data
-d:\svn folder\s0006d - ai\ai\ai\ai.h(103): warning C4244: '+=': conversion from 'float' to 'int', possible loss of data
-d:\svn folder\s0006d - ai\ai\ai\ai.h(122): warning C4244: '-=': conversion from 'float' to 'int', possible loss of data
-d:\svn folder\s0006d - ai\ai\ai\main.cpp(22): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
-d:\svn folder\s0006d - ai\ai\ai\main.cpp(42): warning C4018: '<': signed/unsigned mismatch
-d:\svn folder\s0006d - ai\ai\ai\main.cpp(13): warning C4101: 'specialID': unreferenced local variable
-  AI.cpp
-d:\svn folder\s0006d - ai\ai\ai\ai.h(63): warning C4244: '+=': conversion from 'float' to 'int', possible loss of data
-d:\svn folder\s0006d - ai\ai\ai\ai.h(84): warning C4244: '+=': conversion from 'float' to 'int', possible loss of data
-d:\svn folder\s0006d - ai\ai\ai\ai.h(103): warning C4244: '+=': conversion from 'float' to 'int', possible loss of data
-d:\svn folder\s0006d - ai\ai\ai\ai.h(122): warning C4244: '-=': conversion from 'float' to 'int', possible loss of data
-d:\svn folder\s0006d - ai\ai\ai\ai.cpp(32): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
-d:\svn folder\s0006d - ai\ai\ai\ai.cpp(34): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+﻿  AI.cpp
+c1xx : fatal error C1083: Cannot open source file: 'AI.cpp': No such file or directory
+  main.cpp
+c1xx : fatal error C1083: Cannot open source file: 'main.cpp': No such file or directory
   Generating Code...
-  AI.vcxproj -> D:\SVN Folder\S0006D - AI\AI\Debug\AI.exe
-  AI.vcxproj -> D:\SVN Folder\S0006D - AI\AI\Debug\AI.pdb (Partial PDB)

@@ -1,11 +1,5 @@
 #include "BaseGameEntity.h"
 
-BaseGameEntity::BaseGameEntity()
+void BaseGameEntity::SetID(int val)
 {
-
-}
-
-BaseGameEntity::~BaseGameEntity()
-{
-
 }

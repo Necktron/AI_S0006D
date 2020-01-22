@@ -13,5 +13,4 @@ struct Telegram
 {
 	int Sender;
 	int Receiver;
-	int 
 };
