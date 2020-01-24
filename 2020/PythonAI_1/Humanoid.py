@@ -11,6 +11,7 @@ class State:
     def Exit(self):
         pass
 
+#WIP
 class State_Sleep(State):
     def Enter(self):
         print (self.m_Name+ ": It will be good with a bit of sleep now! Goodnight!")
@@ -52,6 +53,7 @@ class State_Sleep(State):
          else:
              pass
 
+#WIP
 class State_Eat(State):
     def Enter(self):
         self.m_Location = "Restaurant";
@@ -63,6 +65,7 @@ class State_Eat(State):
     def Exit(self):
         pass
 
+#WIP
 class State_Drink(State):
     def Enter(self):
         self.m_Location = "Traversen";
@@ -74,6 +77,7 @@ class State_Drink(State):
     def Exit(self):
         pass
 
+#WIP
 class State_WorkOffice(State):
     def Enter(self):
         self.m_Location = "Downtown Office";
@@ -85,6 +89,7 @@ class State_WorkOffice(State):
     def Exit(self):
         pass
 
+#WIP
 class State_WorkHunt(State):
     def Enter(self):
         self.m_Location = "Northern Forest";
@@ -95,6 +100,7 @@ class State_WorkHunt(State):
     def Exit(self):
         pass
 
+#WIP
 class State_Socialize(State):
     def Enter(self):
         pass
@@ -105,6 +111,7 @@ class State_Socialize(State):
     def Exit(self):
         pass
 
+#Done-ish
 class State_WalkTo(State):
     def Enter(self):
         #HOME START
@@ -204,16 +211,30 @@ class State_WalkTo(State):
         #NORTHERN FOREST STOP
 
         print (self.m_Name+ ": I have to go from " +self.m_Location+ " to " +self.m_GoalLoc+ ". ( Dist = " +str(self.m_distToGoal)+ "m )");
+        self.m_Location = "Outside";
 
     def Execute(self):
-        self.Walk();
+        self.m_walkedDistance += self.m_walkingSpeed;
+        self.m_Energy -= 1;
+        print(str(self.m_walkedDistance)+ "m traversed");
+
+        if self.m_walkedDistance >= self.m_distToGoal:
+            self.m_pCurrentState.Exit(self);
 
     def Exit(self):
-        pass
+        print ("Destination have been reached!")
+        print ("");
+        newStateC = self.m_pGoalState;
+        self.ChangeCurrentState(newStateC);
+        newStateG = None;
+        self.ChangeFutureState(newStateG);
+        self.m_distToGoal = 0;
+        self.m_GoalLoc = None;
 
+#WIP
 class State_Die(State):
     def Enter(self):
-        pass
+        self.m_Location = "The Bright Tunnel";
 
     def Execute(self):
         pass
@@ -221,23 +242,24 @@ class State_Die(State):
     def Exit(self):
         pass
 
+#WIP
 class humanoid(baseGameEntity):
     m_pCurrentState = None;
     m_pGoalState = None; #Only used if the agent is not at correct location
     m_Location = None; #In the future we can set this to a vector of spawn, then move it towards a PoI in engine and check vector math for distance
-    m_GoalLoc = None;
+    m_GoalLoc = None; #Wiped upon arrival to location
     m_ClockRef = None;
     m_Cash = 0;
     m_Hunger = 0;
     m_Thirst = 0;
     m_Energy = 0;
     m_SocialNeed = 0;
-    m_WorkSkill = 0;
-    m_walkingSpeed = 0;
-    m_walkedDistance = 0;
-    m_distToGoal = 0;
-    m_ROS = 0;
-    m_SL = 0;
+    m_WorkSkill = 0; #How much you gain on a daily basis
+    m_walkingSpeed = 0; #How far you get on one tick
+    m_walkedDistance = 0; #How far you have traveled towards your goal location
+    m_distToGoal = 0; #Wiped upon arrival to location
+    m_ROS = 0; #Risk Of Sickness, randomize during night to add a little chaos to everyday life
+    m_SL = 0; #Once you get sick, you are in the faith of God, will you just get the flew or the plague?
 
     def humanoid(self, name, aID, clock):
         self.m_Name = name;
@@ -251,7 +273,7 @@ class humanoid(baseGameEntity):
         self.m_Energy = 30;
         self.m_SocialNeed = 60;
         self.m_WorkSkill = 20;
-        self.m_walkingSpeed = 10;
+        self.m_walkingSpeed = 1;
         self.m_walkedDistance = 0;
         self.m_distToGoal = 0;
         self.m_pCurrentState = State_Sleep;
@@ -271,36 +293,24 @@ class humanoid(baseGameEntity):
         self.m_pGoalState = newStateG;
 
     def Rest(self):
-        self.m_Energy += 1;
+        print (self.m_Name+ ": Zzz...");
+        self.m_Energy += 3;
 
     def Eat(self):
         print (self.m_Name+ ": Nom nom nom!");
-        self.m_Hunger += 1;
+        self.m_Hunger += 5;
 
     def Drink(self):
-        pass
+        print (self.m_Name+ ": *glup glup glup* Whaoeguaoihoa...");
+        self.m_Thirst += 7;
 
     def WorkOffice(self):
         print (self.m_Name+ ": 01001101101... Beep Boop Office Work!");
-        self.m_Cash += 1;
+        self.m_Cash += 10;
 
     def WorkHunt(self):
         pass
 
     def Socialize(self):
-        pass
-
-    def Walk(self):
-        self.m_walkedDistance += self.m_walkingSpeed;
-        self.m_Energy -= 1;
-        print(str(self.m_walkedDistance)+ "m traversed");
-
-        if self.m_walkedDistance >= self.m_distToGoal:
-            print ("Destination have been reached!")
-            print ("");
-            newStateC = self.m_pGoalState;
-            self.ChangeCurrentState(newStateC);
-            newStateG = None;
-            self.ChangeFutureState(newStateG);
-            self.m_distToGoal = 0;
-            self.m_GoalLoc = None;
+        print(self.m_Name+ ": Vädret, hurr durr? Lalala, socialt, har du sett GoT ännu?");
+        self.m_SocialNeed += 4;

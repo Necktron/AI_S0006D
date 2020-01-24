@@ -7,6 +7,3 @@ class baseGameEntity():
 
     def getID(self):
         pass
-
-    def Update(self):
-        pass
