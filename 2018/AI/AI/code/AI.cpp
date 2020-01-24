@@ -28,6 +28,12 @@ Humanoid::~Humanoid()
 
 }
 
+void State_Sleep::Enter(Humanoid* humanoid)
+{
+	cout << "I'm tired" << endl;
+	humanoid->ChangeState(State_Sleep::Execute);
+};
+
 void State_Sleep::Execute(Humanoid* humanoid)
 {
 	if (humanoid->hunger > 0 && humanoid->thirst > 0 && humanoid->timer->hour >= 8)
@@ -70,6 +76,12 @@ void State_Sleep::Execute(Humanoid* humanoid)
 	{
 		humanoid->Rest();
 	}
+};
+
+void State_Sleep::Exit(Humanoid* humanoid)
+{
+	cout << "That was some good sleep" << endl;
+	humanoid->ChangeState(State_NormalLife::Enter);
 };
 
 void State_Eat::Execute(Humanoid* humanoid)
@@ -158,6 +170,8 @@ void State_Drink::Execute(Humanoid* humanoid)
 	{
 		cout << "Argh! My heart! ;_; </3" << endl;
 		humanoid->ChangeState(new State_Die());
+		humanoid->ChangeState(NULL);
+		delete(humanoid);
 	}
 
 	else if (humanoid->hunger <= 0)
@@ -318,7 +332,8 @@ void State_Socialize::Execute(Humanoid* humanoid)
 
 void State_Die::Execute(Humanoid* humanoid)
 {
-	humanoid->alive = false;
 	cout << "It's over... " << humanoid->agentName << " is dead... Rest In Piece </3" << endl;
 	cout << humanoid->agentName << " survived for a total of " << humanoid->timer->daysPassed << "days and " << humanoid->timer->hour << " hours!" <<endl;
+	humanoid->ChangeState(NULL);
+	delete(humanoid);
 };
