@@ -21,7 +21,8 @@ class State_Sleep(State):
             self.m_pCurrentState.Exit(self);
 
         elif self.m_ClockRef.calHour < 8:
-            print (self.m_Name+ ": Zzz...")
+            print (self.m_Name+ ": Zzz...");
+            self.m_Energy += 3;
 
     def Exit(self):
          print (self.m_Name+ ": Erghe... Augh! Goodmorning World!")
@@ -60,22 +61,28 @@ class State_Eat(State):
         print (self.m_Name+ ": Ooooh! Tasty food! Yummy!")
 
     def Execute(self):
-        self.Eat();
+        print (self.m_Name+ ": Nom nom nom!");
+        self.m_Hunger += 5;
 
     def Exit(self):
-        pass
+        print (self.m_Name+ ": Ohm nom! Bhaaa, I'm so stuffed now");
+
+        #Exit states, check what todo next
 
 #WIP
 class State_Drink(State):
     def Enter(self):
         self.m_Location = "Traversen";
-        pass
+        print (self.m_Name+ ": Hi again! I want some Budvar!");
 
     def Execute(self):
-        pass
+        print (self.m_Name+ ": *glup glup glup* Whaoeguaoihoa...");
+        self.m_Thirst += 7;
 
     def Exit(self):
-        pass
+        print (self.m_Name+ ": Aaaaah! That was good, bye bye!");
+
+        #Exit states, check what todo next
 
 #WIP
 class State_WorkOffice(State):
@@ -84,10 +91,13 @@ class State_WorkOffice(State):
         print (self.m_Name+ ": 'AI Interactive', my work place! Let's get that cash!")
 
     def Execute(self):
-        self.WorkOffice();
+        print (self.m_Name+ ": 01001101101... Beep Boop Office Work!");
+        self.m_Cash += 10;
 
     def Exit(self):
-        pass
+        print (self.m_Name+ ": Phew, hard work pays off! I'm signing out for today!");
+
+        #Exit states, check what todo next
 
 #WIP
 class State_WorkHunt(State):
@@ -98,7 +108,9 @@ class State_WorkHunt(State):
         pass
 
     def Exit(self):
-        pass
+        print (self.m_Name+ ": Time to go home, it's was nice being out here on my hunter spot");
+
+        #Exit states, check what todo next
 
 #WIP
 class State_Socialize(State):
@@ -106,10 +118,13 @@ class State_Socialize(State):
         pass
 
     def Execute(self):
-        pass
+        print(self.m_Name+ ": How's the weather? Have you seen the latest episode of GoT?");
+        self.m_SocialNeed += 4;
 
     def Exit(self):
-        pass
+        print (self.m_Name+ ": Time to go home, it's was nice being out here on my hunter spot");
+
+        #Exit states, check what todo next
 
 #Done-ish
 class State_WalkTo(State):
@@ -235,12 +250,15 @@ class State_WalkTo(State):
 class State_Die(State):
     def Enter(self):
         self.m_Location = "The Bright Tunnel";
+        print (self.m_Name+ " died");
 
     def Execute(self):
         pass
 
     def Exit(self):
-        pass
+        print (self.m_Name+ " has been erased from the list of active AI");
+
+        #Exit states, check what todo next
 
 #WIP
 class humanoid(baseGameEntity):
@@ -291,26 +309,3 @@ class humanoid(baseGameEntity):
     def ChangeFutureState(self, newStateG):
         self.m_pGoalState = None;
         self.m_pGoalState = newStateG;
-
-    def Rest(self):
-        print (self.m_Name+ ": Zzz...");
-        self.m_Energy += 3;
-
-    def Eat(self):
-        print (self.m_Name+ ": Nom nom nom!");
-        self.m_Hunger += 5;
-
-    def Drink(self):
-        print (self.m_Name+ ": *glup glup glup* Whaoeguaoihoa...");
-        self.m_Thirst += 7;
-
-    def WorkOffice(self):
-        print (self.m_Name+ ": 01001101101... Beep Boop Office Work!");
-        self.m_Cash += 10;
-
-    def WorkHunt(self):
-        pass
-
-    def Socialize(self):
-        print(self.m_Name+ ": Vädret, hurr durr? Lalala, socialt, har du sett GoT ännu?");
-        self.m_SocialNeed += 4;
