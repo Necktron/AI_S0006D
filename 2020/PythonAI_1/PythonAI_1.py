@@ -1,13 +1,15 @@
 from GameTime import gameTime;
+from Telecom import telecom;
 from Humanoid import humanoid;
 import time;
 import uuid;
 
 clock = gameTime();
+phone = telecom();
 
-#TODO (LAST UPDATED 24/1 2020):
+#TODO (LAST UPDATED 2/2 2020):
 # 1) FIX REST OF STATES AND ALTERNATIVES
-# 2) ADD TELECOM FOR MULTI AI COMMS AND FUTURE NOTICES
+# 2) FINISH TELECOM WITH ALL MESSAGES FOR BOTH SEND AND READ
 # 3) TWEAK VALUES FOR OPTIMAL USAGE
 # 4) PROFIT
 
@@ -38,10 +40,9 @@ def main():
         name = input("Name for AI #" +str(x+1)+ ": ")
         print (name+ ", that's a beautiful name!\n")
 
-        #Assign name to the AI and create it, add it to list of agents
+        #Assign name, ID, clock ref and phone ref to the AI and create it, add it to list of agents
         aID = uuid.uuid1();
-        aSpawn = humanoid().humanoid(name, aID, clock);
-        #FIX IMPLEMENTATION OF AI IN LIST
+        aSpawn = humanoid().humanoid(name, aID, clock, phone);
         agents.append(aSpawn);
 
         x += 1
@@ -50,6 +51,15 @@ def main():
     aOA = len(agents)
     print ("A total of " +str(aOA)+ " agents has been created!")
 
+    x = 0;
+
+    #Update phonebook with all names
+    while x < aOA:
+        phone.phoneBook.append(agents[x]);
+        phone.posConn += 1;
+        x += 1;
+
+    #Core loop for agents update
     while aOA > 0:
 
         if clock.updateRate == 0:
@@ -67,13 +77,19 @@ def main():
             while x < len(agents):
                 agents[x].Update();
                 print ("");
-                x += 1;
+
+                if agents[x].m_Alive == False:
+                    agents.pop(x);
+                    aOA = len(agents);
+
+                else:
+                    x += 1;
 
         if clock.calYears >= 2130:
-            print("Ain't no way anyone is living now! They are all dead!")
+            print("Ain't no way anyone is living now! They're all dead!");
             agents.clear();
             aOA = 0;
 
-    print ("All AI's have died. Program has reached it's end!")
+    print ("All AI's have died. Program has reached it's end!");
 
 main();
