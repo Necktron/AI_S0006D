@@ -7,10 +7,10 @@ import uuid;
 clock = gameTime();
 phone = telecom();
 
-#TODO (LAST UPDATED 2/2 2020):
-# 1) FIX REST OF STATES AND ALTERNATIVES
-# 2) FINISH TELECOM WITH ALL MESSAGES FOR BOTH SEND AND READ
-# 3) TWEAK VALUES FOR OPTIMAL USAGE
+#TODO (LAST UPDATED 3/2 2020):
+# 1) FINISH TELECOM WITH ALL MESSAGES FOR BOTH SEND AND READ
+# 2) TWEAK VALUES FOR OPTIMAL USAGE
+# 3) FIX MESSAGE NBUG WHEN SENDING DELAYED MESSAGES
 # 4) PROFIT
 
 def main():
@@ -61,7 +61,6 @@ def main():
 
     #Core loop for agents update
     while aOA > 0:
-
         if clock.updateRate == 0:
             time.sleep(10);
             print("Time is frozen! Adjust UpdateRate to continue")
@@ -73,6 +72,12 @@ def main():
             clock.Update();
             print ("Clock is " +clock.cTime);
 
+            if len(phone.deliveryQueue) > 0:
+                for msg in phone.deliveryQueue:
+                    if msg.msgTimer == clock.cTime:
+                        phone.SendMSG(msg);
+                        print ("DELAYED MESSAGE HAS BEEN SENT!!!");
+                        phone.deliveryQueue.remove(msg);
             x = 0
             while x < len(agents):
                 agents[x].Update();

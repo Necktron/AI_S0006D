@@ -1,6 +1,6 @@
 class gameTime():
 
-    updateRate = 0.9;
+    updateRate = 0.000001;
 
     calHour = 0;
     calMin = 0;
@@ -23,7 +23,7 @@ class gameTime():
         global calMin
         global calDays
         global calMonths;
-        self.calMin += 60;
+        self.calMin += 1;
 
         if self.calMin >= 60:
             self.calMin = 0;
