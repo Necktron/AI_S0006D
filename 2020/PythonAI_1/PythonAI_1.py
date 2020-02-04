@@ -73,19 +73,32 @@ def main():
             print ("Clock is " +clock.cTime);
 
             if len(phone.deliveryQueue) > 0:
+                msgIndex = 0;
                 for msg in phone.deliveryQueue:
                     if msg.msgTimer == clock.cTime:
                         phone.SendMSG(msg);
-                        print ("DELAYED MESSAGE HAS BEEN SENT!!!");
-                        phone.deliveryQueue.remove(msg);
+                        del phone.deliveryQueue[msgIndex];
+                        print ("Messages in queue after sending: " +str(len(phone.deliveryQueue)));
+
+                        if len(phone.deliveryQueue) == 1:
+                            for msg in phone.deliveryQueue:
+                                if msg.msgTimer == clock.cTime:
+                                    phone.SendMSG(msg);
+                                    del phone.deliveryQueue[msgIndex];
+
+                    msgIndex += 1;
             x = 0
             while x < len(agents):
                 agents[x].Update();
                 print ("");
 
+                #AI is deleted from list of AI's
                 if agents[x].m_Alive == False:
-                    agents.pop(x);
+                    del agents[x];
                     aOA = len(agents);
+
+                    del phone.phoneBook[x];
+                    phone.posConn -= 1;
 
                 else:
                     x += 1;

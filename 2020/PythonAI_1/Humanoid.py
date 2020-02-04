@@ -20,7 +20,7 @@ class State_Sleep(State):
         print (self.m_Name+ ": It will be good with a bit of sleep now! Goodnight!")
 
     def Execute(self):
-        if self.m_Hunger <= 0 or self.m_Thirst <= 0:
+        if self.m_Hunger <= 0 or self.m_Thirst <= 0 or self.m_SocialNeed <= 0:
             print (self.m_Name+ ": OOOOOF");
             newStateC = State_Die;
             self.ChangeCurrentState(newStateC);
@@ -46,17 +46,15 @@ class State_Sleep(State):
             self.m_Energy += 3;
 
         elif self.m_ClockRef.cTime == "08:00":
-            if self.m_SocialNeed < 500:
-                if self.m_PhoneRef.posConn > 1:
-                    self.AskToHangout();
-                else:
-                    print (self.m_Name+ ": The world is so lonely :c");
-
             self.m_pCurrentState.Exit(self);
 
-        elif (self.m_ClockRef.calHour < 8 or self.m_ClockRef.calHour > 21) or self.m_Energy < 60:
+        elif (self.m_ClockRef.calHour < 8 or self.m_ClockRef.calHour >= 21) or self.m_Energy < 60:
             print (self.m_Name+ ": Zzz...");
             self.m_Energy += 1;
+
+        else:
+            print ("ERROR!!! FIX IT BOIIII");
+
 
     def Exit(self):
         if self.m_pGoalState == State_Socialize:
@@ -65,9 +63,10 @@ class State_Sleep(State):
 
         else:
             print (self.m_Name+ ": Erghe... Augh! Goodmorning World!")
+            self.SocialCheck();
 
             #FOOD
-            if self.m_Hunger < 50 and self.m_Cash >= 400:
+            if self.m_Hunger < 30 and self.m_Cash >= 200:
                 if self.m_Location != "The Restaurant":
                    self.m_GoalLoc = "The Restaurant";
                    newStateC = State_WalkTo;
@@ -80,7 +79,7 @@ class State_Sleep(State):
                    self.ChangeCurrentState(newStateC);
 
             #THIRST
-            elif self.m_Thirst < 50 and self.m_Cash >= 400:
+            elif self.m_Thirst < 50 and self.m_Cash >= 200:
                 if self.m_Location != "Traversen":
                    self.m_GoalLoc = "Traversen";
                    newStateC = State_WalkTo;
@@ -106,7 +105,7 @@ class State_Sleep(State):
                    self.ChangeCurrentState(newStateC);
 
             #WORK
-            elif self.m_Cash < 1000:
+            elif self.m_Cash < 2000:
                 #If you own a gun and a little wealthy
                 if self.m_OwnsGun == True and self.m_Cash >= 800:
                     print (self.m_Name+ ": I own a gun and I have plenty of cash, a hunting day can't hurt that much!");
@@ -159,26 +158,44 @@ class State_Sleep(State):
                         newStateC = State_WorkOffice;
                         self.ChangeCurrentState(newStateC);
 
+            else:
+                print (self.m_Name+ ": Everything is good, I'm not hungry, not thirsty and I have alot of of the green!");
+                print (self.m_Name+ ": Might aswell relax at home and watch some TV!");
+                if self.m_Location != "Home":
+                   self.m_GoalLoc = "Home";
+                   newStateC = State_WalkTo;
+                   self.ChangeCurrentState(newStateC);
+                   newStateG = State_Idle;
+                   self.ChangeGoalState(newStateG);
+
+                else:
+                   newStateC = State_Idle;
+                   self.ChangeCurrentState(newStateC);
+
 #WIP
 class State_Eat(State):
     def Enter(self):
         print (self.m_Name+ ": Ooooh! Tasty food! Yummy!")
 
     def Execute(self):
-        print (self.m_Name+ ": Nom nom nom!");
-        self.m_Hunger += 6 - self.m_SL;
-        self.m_Cash -= 5;
-        print (self.m_Name+ " (CASH): " +str(self.m_Cash));
-        print (self.m_Name+ " (HUNGER): " +str(self.m_Hunger));
 
-        if self.m_Cash < 40 or self.m_Hunger > 380:
-            if self.m_SocialNeed < 500:
-                if self.m_PhoneRef.posConn > 1:
-                    self.AskToHangout();
-                else:
-                    print (self.m_Name+ ": The world is so lonely :c");
+        if self.m_Hunger <= 0 or self.m_Thirst <= 0 or self.m_SocialNeed <= 0:
+            print (self.m_Name+ ": OOOOOF");
+            newStateC = State_Die;
+            self.ChangeCurrentState(newStateC);
+            self.m_pCurrentState.Enter(self);
+
+        elif self.m_Cash < 40 or self.m_Hunger > 380:
+            self.SocialCheck();
 
             self.m_pCurrentState.Exit(self);
+
+        else:
+            print (self.m_Name+ ": Nom nom nom!");
+            self.m_Hunger += 6 - self.m_SL;
+            self.m_Cash -= 5;
+            print (self.m_Name+ " (CASH): " +str(self.m_Cash));
+            print (self.m_Name+ " (HUNGER): " +str(self.m_Hunger));
 
     def Exit(self):
         if self.m_Hunger > 380:
@@ -212,16 +229,16 @@ class State_Eat(State):
                 self.ChangeCurrentState(newStateC);
 
         #THIRST
-        elif self.m_Thirst < 30 and self.m_Cash >= 50:
+        elif self.m_Thirst < 50 and self.m_Cash >= 50:
             if self.m_Location != "Traversen":
                 self.m_GoalLoc = "Traversen";
                 newStateC = State_WalkTo;
                 self.ChangeCurrentState(newStateC);
-                newStateG = State_Eat;
+                newStateG = State_Drink;
                 self.ChangeGoalState(newStateG);
 
             else:
-                newStateC = State_Eat;
+                newStateC = State_Drink;
                 self.ChangeCurrentState(newStateC);
 
         #Time to move home
@@ -293,26 +310,42 @@ class State_Eat(State):
                     newStateC = State_WorkOffice;
                     self.ChangeCurrentState(newStateC);
 
+        else:
+            print (self.m_Name+ ": I think I'm going home for today!");
+            if self.m_Location != "Home":
+                self.m_GoalLoc = "Home";
+                newStateC = State_WalkTo;
+                self.ChangeCurrentState(newStateC);
+                newStateG = State_Sleep;
+                self.ChangeGoalState(newStateG);
+
+            else:
+                newStateC = State_Sleep;
+                self.ChangeCurrentState(newStateC);
+
 #WIP
 class State_Drink(State):
     def Enter(self):
         print (self.m_Name+ ": Ooooh! A cold refreshing drink!")
 
     def Execute(self):
-        print (self.m_Name+ ": *glub glub glub* Hahahaaa, waahgerhugha!");
-        self.m_Thirst += 14 - self.m_SL;
-        self.m_Cash -= 5;
-        print (self.m_Name+ " (CASH): " +str(self.m_Cash));
-        print (self.m_Name+ " (THIRST): " +str(self.m_Thirst));
+        if self.m_Hunger <= 0 or self.m_Thirst <= 0 or self.m_SocialNeed <= 0:
+            print (self.m_Name+ ": OOOOOF");
+            newStateC = State_Die;
+            self.ChangeCurrentState(newStateC);
+            self.m_pCurrentState.Enter(self);
 
-        if self.m_Cash < 40 or self.m_Thirst > 240:
-            if self.m_SocialNeed < 500:
-                if self.m_PhoneRef.posConn > 1:
-                    self.AskToHangout();
-                else:
-                    print (self.m_Name+ ": The world is so lonely :c");
+        elif self.m_Cash < 40 or self.m_Thirst > 240:
+            self.SocialCheck();
 
             self.m_pCurrentState.Exit(self);
+
+        else:
+            print (self.m_Name+ ": *glub glub glub* Hahahaaa, waahgerhugha!");
+            self.m_Thirst += 14 - self.m_SL;
+            self.m_Cash -= 5;
+            print (self.m_Name+ " (CASH): " +str(self.m_Cash));
+            print (self.m_Name+ " (THIRST): " +str(self.m_Thirst));
 
     def Exit(self):
         if self.m_Thirst > 240:
@@ -427,26 +460,21 @@ class State_Drink(State):
                     newStateC = State_WorkOffice;
                     self.ChangeCurrentState(newStateC);
 
-#WIP
+#WIP - FIX IT
 class State_WorkOffice(State):
     def Enter(self):
         print (self.m_Name+ ": 'AI Interactive', my work place! Let's get that cash!")
 
     def Execute(self):
 
-        if self.m_Hunger <= 0 or self.m_Thirst <= 0:
+        if self.m_Hunger <= 0 or self.m_Thirst <= 0 or self.m_SocialNeed <= 0:
             print (self.m_Name+ ": OOOOOF");
             newStateC = State_Die;
             self.ChangeCurrentState(newStateC);
             self.m_pCurrentState.Enter(self);
 
-        elif self.m_ClockRef.calHour >= 17 or self.m_Cash > 2000 or self.m_Hunger < 25 or self.m_Thirst < 20 or self.m_Energy < 30:
-            if self.m_SocialNeed < 500 and self.m_pFutureState == None:
-                if self.m_PhoneRef.posConn > 1:
-                    self.AskToHangout();
-                else:
-                    print (self.m_Name+ ": The world is so lonely :c");
-
+        elif self.m_ClockRef.calHour >= 17 or self.m_Cash > 2000 or self.m_Hunger < 30 or self.m_Thirst < 50 or self.m_Energy < 30:
+            self.SocialCheck();
             self.m_pCurrentState.Exit(self);
 
         else:
@@ -458,100 +486,96 @@ class State_WorkOffice(State):
             self.m_Thirst -= 1 + self.m_SL;
 
     def Exit(self):
-        if self.m_pGoalState == State_Socialize:
-            newStateC = State_WalkTo;
-            self.ChangeCurrentState(newStateC);
 
-        else:
-            #SLEEP
-            if self.m_Energy < 30:
+        #SLEEP
+        if self.m_Energy < 30:
 
-                print (self.m_Name+ ": Phew, hard work pays off! I'm signing out for today!");
+            print (self.m_Name+ ": Phew, hard work pays off! I'm signing out for today!");
+
+            if self.m_Location != "Home":
+                self.m_GoalLoc = "Home";
+                newStateC = State_WalkTo;
+                self.ChangeCurrentState(newStateC);
+                newStateG = State_Idle;
+                self.ChangeGoalState(newStateG);
+
+            else:
+                newStateC = State_Idle;
+                self.ChangeCurrentState(newStateC);
+
+        #FOOD
+        elif self.m_Hunger < 30 and self.m_Cash >= 40:
+
+            print (self.m_Name+ ": I'm quite hungry! I'm signing out for now!");
+            newStateP = State_WorkOffice;
+            self.ChangePreviousState(newStateP);
+
+            if self.m_Location != "The Restaurant":
+                self.m_GoalLoc = "The Restaurant";
+                newStateC = State_WalkTo;
+                self.ChangeCurrentState(newStateC);
+                newStateG = State_Eat;
+                self.ChangeGoalState(newStateG);
+
+            else:
+                newStateC = State_Eat;
+                self.ChangeCurrentState(newStateC);
+
+        #THIRST
+        elif self.m_Thirst < 50 and self.m_Cash >= 50:
+
+            print (self.m_Name+ ": I'm quite thirsty! I'm signing out for now!");
+
+            if self.m_Location != "Traversen":
+                self.m_GoalLoc = "Traversen";
+                newStateC = State_WalkTo;
+                self.ChangeCurrentState(newStateC);
+                newStateG = State_Drink;
+                self.ChangeGoalState(newStateG);
+
+            else:
+                newStateC = State_Drink;
+                self.ChangeCurrentState(newStateC);
+
+        #Time to move home
+        elif self.m_ClockRef.calHour >= 17:
+                print (self.m_Name+ ": I think I'm going home for today!");
 
                 if self.m_Location != "Home":
                     self.m_GoalLoc = "Home";
                     newStateC = State_WalkTo;
                     self.ChangeCurrentState(newStateC);
-                    newStateG = State_Sleep;
+                    newStateG = State_Idle;
                     self.ChangeGoalState(newStateG);
 
                 else:
-                    newStateC = State_Sleep;
+                    newStateC = State_Idle;
                     self.ChangeCurrentState(newStateC);
 
-            #FOOD
-            elif self.m_Hunger < 25 and self.m_Cash >= 40:
-
-                print (self.m_Name+ ": I'm quite hungry! I'm signing out for now!");
-                newStateP = State_WorkOffice;
-                self.ChangePreviousState(newStateP);
-
-                if self.m_Location != "The Restaurant":
-                    self.m_GoalLoc = "The Restaurant";
-                    newStateC = State_WalkTo;
-                    self.ChangeCurrentState(newStateC);
-                    newStateG = State_Eat;
-                    self.ChangeGoalState(newStateG);
-
-                else:
-                    newStateC = State_Eat;
-                    self.ChangeCurrentState(newStateC);
-
-            #THIRST
-            elif self.m_Thirst < 20 and self.m_Cash >= 50:
-
-                print (self.m_Name+ ": I'm quite thirsty! I'm signing out for now!");
-
-                if self.m_Location != "Traversen":
-                    self.m_GoalLoc = "Traversen";
-                    newStateC = State_WalkTo;
-                    self.ChangeCurrentState(newStateC);
-                    newStateG = State_Drink;
-                    self.ChangeGoalState(newStateG);
-
-                else:
-                    newStateC = State_Drink;
-                    self.ChangeCurrentState(newStateC);
-
-            #Time to move home
-            elif self.m_ClockRef.calHour >= 17:
-                    print (self.m_Name+ ": I think I'm going home for today!");
-
-                    if self.m_Location != "Home":
-                        self.m_GoalLoc = "Home";
-                        newStateC = State_WalkTo;
-                        self.ChangeCurrentState(newStateC);
-                        newStateG = State_Sleep;
-                        self.ChangeGoalState(newStateG);
-
-                    else:
-                        newStateC = State_Sleep;
-                        self.ChangeCurrentState(newStateC);
-
-            #WORK
-            else:
-                #If you own a gun and a little wealthy
-                if self.m_OwnsGun == True and self.m_Cash >= 800:
-                    print (self.m_Name+ ": I own a gun and I have plenty of cash, a hunting day can't hurt that much!");
-                    if self.m_Location != "Northern Forest":
-                        self.m_GoalLoc = "Northern Forest";
-                        newStateC = State_WalkTo;
-                        self.ChangeCurrentState(newStateC);
-                        newStateG = State_WorkHunt;
-                        self.ChangeGoalState(newStateG);
-
-                    else:
-                        newStateC = State_WorkHunt;
-                        self.ChangeCurrentState(newStateC);
-
-                #If you don't own a gun but can afford one
-                elif self.m_OwnsGun == False and self.m_Cash >= 500:
-                    print (self.m_Name+ ": I want to buy a gun so I can hunt");
-                    self.m_GoalLoc = "The Mall";
+        #WORK
+        else:
+            #If you own a gun and a little wealthy
+            if self.m_OwnsGun == True and self.m_Cash >= 800:
+                print (self.m_Name+ ": I own a gun and I have plenty of cash, a hunting day can't hurt that much!");
+                if self.m_Location != "Northern Forest":
+                    self.m_GoalLoc = "Northern Forest";
                     newStateC = State_WalkTo;
                     self.ChangeCurrentState(newStateC);
                     newStateG = State_WorkHunt;
                     self.ChangeGoalState(newStateG);
+
+                else:
+                    newStateC = State_WorkHunt;
+                    self.ChangeCurrentState(newStateC);
+
+            #If you don't own a gun but can afford one
+            elif self.m_OwnsGun == False and self.m_Cash >= 500:
+                print (self.m_Name+ ": I want to buy a gun so I can hunt");
+                self.m_GoalLoc = "The Mall";
+                newStateC = State_WalkTo;
+                self.ChangeCurrentState(newStateC);
+                newStateG = State_WorkHunt;
+                self.ChangeGoalState(newStateG);
 
 #WIP
 class State_WorkHunt(State):
@@ -566,18 +590,14 @@ class State_WorkHunt(State):
             self.ChangeCurrentState(newStateC);
             self.m_pCurrentState.Enter(self);
 
-        if self.m_ClockRef.calHour >= 19 or self.m_Cash > 2000 or self.m_Hunger < 25 or self.m_Thirst < 20 or self.m_Energy < 30:
+        if self.m_ClockRef.calHour >= 19 or self.m_Cash > 2000 or self.m_Hunger < 30 or self.m_Thirst < 50 or self.m_Energy < 30:
 
             print (self.m_Name+ ": Finished hunting for today! I got a total of " +str(self.m_huntingScore)+ " elks today!");
             self.m_Cash += self.m_huntingScore * 250;
             print (self.m_Name+ " got a total of " +str(self.m_huntingScore * 250)+ "kr today from hunting!");
             self.m_huntingScore = 0;
 
-            if self.m_SocialNeed < 500:
-                if self.m_PhoneRef.posConn > 1:
-                    self.AskToHangout();
-                else:
-                    print (self.m_Name+ ": The world is so lonely :c");
+            self.SocialCheck();
 
             self.m_pCurrentState.Exit(self);
 
@@ -588,8 +608,8 @@ class State_WorkHunt(State):
             self.m_Hunger -= 1 + self.m_SL;
             self.m_Thirst -= 1 + self.m_SL;
 
-            ASC = randint(0, 100);
-            if ASC > 92:
+            ASC = randint(0, 1000);
+            if ASC > 990:
                 print (self.m_Name+ ": OMG! An elk! Time for a shot!");
 
                 HTC = randint(0, 50);
@@ -603,105 +623,100 @@ class State_WorkHunt(State):
 
     def Exit(self):
 
-        if self.m_pGoalState == State_Socialize:
-            newStateC = State_WalkTo;
-            self.ChangeCurrentState(newStateC);
+        #SLEEP
+        if self.m_Energy < 30:
+            print (self.m_Name+ ": Argh! I'm so tired, time to go home and sleep");
 
-        else:
-            #SLEEP
-            if self.m_Energy < 30:
-                print (self.m_Name+ ": Argh! I'm so tired, time to go home and sleep");
+            if self.m_Location != "Home":
+                self.m_GoalLoc = "Home";
+                newStateC = State_WalkTo;
+                self.ChangeCurrentState(newStateC);
+                newStateG = State_Sleep;
+                self.ChangeGoalState(newStateG);
 
-                if self.m_Location != "Home":
-                    self.m_GoalLoc = "Home";
-                    newStateC = State_WalkTo;
-                    self.ChangeCurrentState(newStateC);
-                    newStateG = State_Sleep;
-                    self.ChangeGoalState(newStateG);
+            else:
+                newStateC = State_Sleep;
+                self.ChangeCurrentState(newStateC);
 
-                else:
-                    newStateC = State_Sleep;
-                    self.ChangeCurrentState(newStateC);
+        #FOOD
+        elif self.m_Hunger < 30 and self.m_Cash >= 40:
 
-            #FOOD
-            elif self.m_Hunger < 25 and self.m_Cash >= 40:
+            print (self.m_Name+ ": I'm quite hungry! I'm leaving my hunting spot for now!");
+            newStateP = State_WorkHunt;
+            self.ChangePreviousState(newStateP);
 
-                print (self.m_Name+ ": I'm quite hungry! I'm leaving my hunting spot for now!");
-                newStateP = State_WorkHunt;
-                self.ChangePreviousState(newStateP);
+            if self.m_Location != "The Restaurant":
+                self.m_GoalLoc = "The Restaurant";
+                newStateC = State_WalkTo;
+                self.ChangeCurrentState(newStateC);
+                newStateG = State_Eat;
+                self.ChangeGoalState(newStateG);
 
-                if self.m_Location != "The Restaurant":
-                    self.m_GoalLoc = "The Restaurant";
-                    newStateC = State_WalkTo;
-                    self.ChangeCurrentState(newStateC);
-                    newStateG = State_Eat;
-                    self.ChangeGoalState(newStateG);
+            else:
+                newStateC = State_Eat;
+                self.ChangeCurrentState(newStateC);
 
-                else:
-                    newStateC = State_Eat;
-                    self.ChangeCurrentState(newStateC);
+        #THIRST
+        elif self.m_Thirst < 50 and self.m_Cash >= 50:
 
-            #THIRST
-            elif self.m_Thirst < 20 and self.m_Cash >= 50:
+            print (self.m_Name+ ": I'm quite thirsty! I'm leaving my hunting spot for now!");
+            newStateP = State_WorkHunt;
+            self.ChangePreviousState(newStateP);
 
-                print (self.m_Name+ ": I'm quite thirsty! I'm leaving my hunting spot for now!");
-                newStateP = State_WorkHunt;
-                self.ChangePreviousState(newStateP);
+            if self.m_Location != "Traversen":
+                self.m_GoalLoc = "Traversen";
+                newStateC = State_WalkTo;
+                self.ChangeCurrentState(newStateC);
+                newStateG = State_Drink;
+                self.ChangeGoalState(newStateG);
 
-                if self.m_Location != "Traversen":
-                    self.m_GoalLoc = "Traversen";
-                    newStateC = State_WalkTo;
-                    self.ChangeCurrentState(newStateC);
-                    newStateG = State_Drink;
-                    self.ChangeGoalState(newStateG);
+            else:
+                newStateC = State_Drink;
+                self.ChangeCurrentState(newStateC);
 
-                else:
-                    newStateC = State_Drink;
-                    self.ChangeCurrentState(newStateC);
+        #Time to move home
+        elif self.m_ClockRef.calHour >= 19:
+            print (self.m_Name+ ": I think I'm going home for today!");
 
-            #Time to move home
-            elif self.m_ClockRef.calHour >= 19:
-                print (self.m_Name+ ": I think I'm going home for today!");
+            if self.m_Location != "Home":
+                self.m_GoalLoc = "Home";
+                newStateC = State_WalkTo;
+                self.ChangeCurrentState(newStateC);
+                newStateG = State_Sleep;
+                self.ChangeGoalState(newStateG);
 
-                if self.m_Location != "Home":
-                    self.m_GoalLoc = "Home";
-                    newStateC = State_WalkTo;
-                    self.ChangeCurrentState(newStateC);
-                    newStateG = State_Sleep;
-                    self.ChangeGoalState(newStateG);
+            else:
+                newStateC = State_Sleep;
+                self.ChangeCurrentState(newStateC);
 
-                else:
-                    newStateC = State_Sleep;
-                    self.ChangeCurrentState(newStateC);
-
-            #WORK
-            elif self.m_Cash < 2000:
-                #If you own a gun and a little wealthy
-                if self.m_OwnsGun == True and self.m_Cash >= 800:
-                    print (self.m_Name+ ": I own a gun and I have plenty of cash, a hunting day can't hurt that much!");
-                    if self.m_Location != "Northern Forest":
-                        self.m_GoalLoc = "Northern Forest";
-                        newStateC = State_WalkTo;
-                        self.ChangeCurrentState(newStateC);
-                        newStateG = State_WorkHunt;
-                        self.ChangeGoalState(newStateG);
-
-                    else:
-                        newStateC = State_WorkHunt;
-                        self.ChangeCurrentState(newStateC);
-
-                #If you don't own a gun but can afford one
-                elif self.m_OwnsGun == False and self.m_Cash >= 500:
-                    print (self.m_Name+ ": I want to buy a gun so I can hunt");
-                    self.m_GoalLoc = "The Mall";
+        #WORK
+        elif self.m_Cash < 2000:
+            #If you own a gun and a little wealthy
+            if self.m_OwnsGun == True and self.m_Cash >= 800:
+                print (self.m_Name+ ": I own a gun and I have plenty of cash, a hunting day can't hurt that much!");
+                if self.m_Location != "Northern Forest":
+                    self.m_GoalLoc = "Northern Forest";
                     newStateC = State_WalkTo;
                     self.ChangeCurrentState(newStateC);
                     newStateG = State_WorkHunt;
                     self.ChangeGoalState(newStateG);
 
                 else:
-                    newStateC = State_Sleep;
+                    newStateC = State_WorkHunt;
                     self.ChangeCurrentState(newStateC);
+
+            #If you don't own a gun but can afford one
+            elif self.m_OwnsGun == False and self.m_Cash >= 500:
+                print (self.m_Name+ ": I want to buy a gun so I can hunt");
+                self.m_GoalLoc = "The Mall";
+                newStateC = State_WalkTo;
+                self.ChangeCurrentState(newStateC);
+                newStateG = State_WorkHunt;
+                self.ChangeGoalState(newStateG);
+
+            else:
+                newStateC = State_Sleep;
+                self.ChangeCurrentState(newStateC);
         #Exit states, check what todo next
 
 #WIP - REQUIER TELECOM SCRIPT
@@ -717,13 +732,13 @@ class State_Socialize(State):
             self.ChangeCurrentState(newStateC);
             self.m_pCurrentState.Enter(self);
 
-        if self.m_SocialNeed > 1750 or self.m_Cash < 60 or self.m_Energy < 50:
+        if self.m_SocialNeed > 2350 or self.m_Cash < 60 or self.m_Energy < 50:
             print (self.m_Name+ ": I'm sorry but I have to go now");
             self.m_PersonToMeet.m_pCurrentState.Exit(self.m_PersonToMeet);
             self.m_pCurrentState.Exit(self);
 
         else:
-            if self.m_PersonToMeet.m_SocialNeed <= 1750 or self.m_PersonToMeet.m_Cash >= 60:
+            if self.m_PersonToMeet.m_SocialNeed <= 2350 or self.m_PersonToMeet.m_Cash >= 60:
                 print (self.m_Name+ ": " +self.m_PhoneRef.MSG_Socialize_Conversation[randint(0, len(self.m_PhoneRef.MSG_Socialize_Conversation) - 1)]);
 
             if self.m_Location == "The Park":
@@ -741,10 +756,15 @@ class State_Socialize(State):
                 self.m_Energy -= 1;
                 self.m_Cash -= 5;
 
+            elif self.m_Location == "The Mall":
+                self.m_SocialNeed += 60 - self.m_SL;
+                self.m_Energy -= 1;
+
     def Exit(self):
         print (self.m_Name+ ": Bye " +self.m_PersonToMeet.m_Name+ "! See you another time!");
-        newStateF = None;
-        self.ChangeFutureState(newStateF); #Set to none to let people know they can be met again
+        newStateG = None;
+        self.ChangeGoalState(newStateG); #Set to none to let people know they can be met again
+        self.m_PersonToMeet = None; #Set to none to let people know they can be met again
 
         #SLEEP
         if self.m_Energy < 50:
@@ -867,15 +887,10 @@ class State_Idle(State):
             else:
                 print (self.m_Name+ ": I'm waiting for my friend~");
 
-        elif self.m_pGoalState == State_WorkOffice:
-            print (self.m_Name+ ": I'm waiting for office hours to begin");
-
         elif self.m_Location == "Home":
             #FOOD
             if self.m_Hunger < 30 and self.m_Cash >= 40:
-                print (self.m_Name+ ": I'm quite hungry! I need some food before going to bed!");
-                newStateP = State_Sleep;
-                self.ChangePreviousState(newStateP);
+                print (self.m_Name+ ": I'm quite hungry! I need some food!");
 
                 if self.m_Location != "The Restaurant":
                     self.m_GoalLoc = "The Restaurant";
@@ -906,15 +921,40 @@ class State_Idle(State):
                     newStateC = State_Drink;
                     self.ChangeCurrentState(newStateC);
 
-            elif self.m_ClockRef.calHour < 21 or (self.m_ClockRef.calHour <= 21 and self.m_ClockRef.calMin < 50):
-                    print (self.m_Name+ ": Watching TV and just relaxing before going to bed");
+            elif self.m_ClockRef.calHour < 21 or (self.m_ClockRef.calHour <= 21 and self.m_ClockRef.calMin < 55):
+                    print (self.m_Name+ ": Watching TV and just relaxing");
 
             elif self.m_ClockRef.calHour >= 22:
-                if self.m_SocialNeed < 500:
-                    if self.m_PhoneRef.posConn > 1:
-                        self.AskToHangout();
-                    else:
-                        print (self.m_Name+ ": The world is so lonely :c");
+                self.SocialCheck();
+
+                #You are filthy rich and will turn into a human potato if you only stay at home and watch TV
+                #Donate some cash so you need to go to work the next day
+                if self.m_Cash > 2000:
+                    print (self.m_Name+ ": I don't know what to do with all of this money!");
+                    print (self.m_Name+ ": " +self.m_PhoneRef.MSG_MakeItRain[randint(0, len(self.m_PhoneRef.MSG_MakeItRain) - 1)]);
+
+                    moneyToDonate = 0;
+
+                    if 2000 < self.m_Cash < 2199:
+                        moneyToDonate = 1800;
+
+                    elif 2200 < self.m_Cash < 2399:
+                        moneyToDonate = 2000;
+
+                    elif 2400 < self.m_Cash < 2599:
+                        moneyToDonate = 2200;
+
+                    elif 2600 < self.m_Cash < 2799:
+                        moneyToDonate = 2400;
+
+                    elif 2800 < self.m_Cash < 2999:
+                        moneyToDonate = 2600;
+
+                    elif 3000 < self.m_Cash:
+                        moneyToDonate = 2800;
+
+                    self.m_Cash -= moneyToDonate;
+                    print (self.m_Name+ " spent " +str(moneyToDonate)+ "kr on what ever was written above!");
 
                 newStateC = self.m_pGoalState;
                 self.ChangeCurrentState(newStateC);
@@ -926,7 +966,7 @@ class State_Idle(State):
                 print (self.m_Name+ ": Preparing to go to bed, brushing teeth and putting on my pyamas");
     
     def Exit(self):
-        print (self.m_Name+ ": Back to reality! Now, where was I");
+        print (self.m_Name+ ": Now, where was I...");
 
 #Done-ish
 class State_WalkTo(State):
@@ -1028,7 +1068,6 @@ class State_WalkTo(State):
         #NORTHERN FOREST STOP
 
         print (self.m_Name+ ": I have to go from " +self.m_Location+ " to " +self.m_GoalLoc+ ". ( Dist = " +str(self.m_distToGoal)+ "m )");
-        self.m_Location = "Outside";
 
     def Execute(self):
         self.m_walkedDistance += self.m_walkingSpeed;
@@ -1038,10 +1077,17 @@ class State_WalkTo(State):
         self.m_SocialNeed -= 1;
         print(self.m_Name+ ": " +str(self.m_walkedDistance)+ "m traversed");
 
-        if self.m_walkedDistance >= self.m_distToGoal and self.m_GoalLoc != "The Mall":
+        if self.m_Hunger <= 0 or self.m_Thirst <= 0:
+            print (self.m_Name+ ": OOOOOF");
+            newStateC = State_Die;
+            self.ChangeCurrentState(newStateC);
+            self.m_pCurrentState.Enter(self);
+
+        elif self.m_walkedDistance >= self.m_distToGoal:
+            self.SocialCheck();
             self.m_pCurrentState.Exit(self);
 
-        elif self.m_walkedDistance >= self.m_distToGoal and self.m_GoalLoc == "The Mall":
+        elif self.m_walkedDistance >= self.m_distToGoal and (self.m_GoalLoc == "The Mall" and self.m_pGoalState == State_WorkHunt):
             self.m_Location = self.m_GoalLoc;
             print ("Destination have been reached!");
             print ("");
@@ -1083,6 +1129,18 @@ class State_Die(State):
         self.m_Location = "The Bright Tunnel";
 
     def Execute(self):
+        if self.m_Hunger <= 0:
+            print (self.m_Name+ " died of hunger!");
+
+        elif self.m_Thirst <= 0:
+            print (self.m_Name+ " died of thirst!");
+
+        elif self.m_SocialNeed <= 0:
+            print (self.m_Name+ " died of loneliness!");
+
+        elif self.m_Energy <= 0:
+            print (self.m_Name+ " died of stress!");
+
         self.m_pCurrentState.Exit(self);
 
     def Exit(self):
@@ -1096,7 +1154,6 @@ class humanoid(baseGameEntity):
     m_pPreviousState = None; #What did the AI do before? In case we want to go back to our previous state
     m_pCurrentState = None;
     m_pGoalState = None; #Only used if the agent is not at correct location
-    m_pFutureState = None; #Used for planing activities a bit into the future
     m_Location = None; #In the future we can set this to a vector of spawn, then move it towards a PoI in engine and check vector math for distance
     m_GoalLoc = None; #Wiped upon arrival to location
     m_ClockRef = None;
@@ -1130,7 +1187,7 @@ class humanoid(baseGameEntity):
         self.m_Hunger = randint(200, 260);
         self.m_Thirst = randint(350, 400);
         self.m_Energy = randint(180, 200);
-        self.m_SocialNeed = randint(1400, 2360);
+        self.m_SocialNeed = randint(800, 1200);
         self.m_walkingSpeed = randint(2, 4);
         self.m_pCurrentState = State_Sleep;
 
@@ -1166,10 +1223,16 @@ class humanoid(baseGameEntity):
         self.m_pGoalState = None;
         self.m_pGoalState = newStateG;
 
-        #DONE
-    def ChangeFutureState(self, newStateF):
-        self.m_pFutureState = None;
-        self.m_pFutureState = newStateF;
+    def SocialCheck(self):
+        if self.m_SocialNeed < 500:
+            if self.m_PersonToMeet != None:
+                print (self.m_Name+ ": I already have a meeting planned, can't book another yet!");
+
+            else:
+                if self.m_PhoneRef.posConn > 1:
+                    self.AskToHangout();
+                else:
+                    print (self.m_Name+ ": The world is so lonely :c");
 
     #DONE
     def AskToHangout(self):
@@ -1177,7 +1240,8 @@ class humanoid(baseGameEntity):
         r = self.ConnRecieveer();
         t = self.ConnTime();
         l = self.ConnLocation();
-        message = self.m_PhoneRef.SMS().Message(s, r, 1, self.m_PhoneRef.MSG_MeetUp_Question[randint(0, len(self.m_PhoneRef.MSG_MeetUp_Question) - 1)], t,  self.m_PhoneRef.meetingsSpots[l], None);
+        message = self.m_PhoneRef.SMS().Message(s, r, 1, self.m_PhoneRef.MSG_MeetUp_Question[randint(0, len(self.m_PhoneRef.MSG_MeetUp_Question) - 1)], t, self.m_PhoneRef.meetingsSpots[l], None);
+        #message = self.m_PhoneRef.SMS().Message(s, r, 1, self.m_PhoneRef.MSG_MeetUp_Question[randint(0, len(self.m_PhoneRef.MSG_MeetUp_Question) - 1)], t,  self.m_PhoneRef.meetingsSpots[l], None);
         self.m_PhoneRef.SendMSG(message);
 
     #DONE
@@ -1194,7 +1258,8 @@ class humanoid(baseGameEntity):
 
     #DONE
     def ConnSender(self):
-        return self;
+        senderAI = self;
+        return senderAI;
 
     #DONE
     def ConnRecieveer(self):

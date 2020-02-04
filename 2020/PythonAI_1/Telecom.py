@@ -18,7 +18,7 @@ class telecom():
         msgTimer = None;
 
         #Message SMS with timer
-        def Message(self, msgSender, msgRecieveer, msgClass, msgContent, msgMeetingTime, msgLocation, msgTimer):
+        def Message( self, msgSender, msgRecieveer, msgClass, msgContent, msgMeetingTime, msgLocation, msgTimer):
             self.msgSender = msgSender;
             self.msgRecieveer = msgRecieveer;
             self.msgClass = msgClass;
@@ -35,13 +35,13 @@ class telecom():
         MSG_DeclineMeeting = 3; #Sent to another AI for confirmation of meeting
         MSG_GotoMeeting = 4; #Sent to yourself for reminder of going to meeting
         MSG_AbortMeeting = 5; #Sent to another AI to abort planned meeting if anything happens
-        MSG_WorldDanger = 6; #Sent to all AIs to confirm that something terrible has happend
+        MSG_ValidateMeetinProp = 6; #Sent to AI's with planned meeting to see if they can still go
         MSG_Grief = 7; #Sent to all AIs to confirm that something terrible has happend
 
     phoneBook = [];
     deliveryQueue = [];
     posConn = 0;
-    meetingsSpots = [ "The Restaurant", "The Park", "Traversen" ];
+    meetingsSpots = [ "The Restaurant", "The Park", "Traversen", "The Mall" ];
     posMeeting = len(meetingsSpots);
 
     #Messages to write when sending a request to meet up
@@ -70,7 +70,8 @@ class telecom():
     MSG_Declined_Response = [ "Whaaaa...!",
                                 "Hmmm... :c",
                                 "Awww :(",
-                                "Booo! Sad :c" ];
+                                "Booo! Sad :c",
+                                "K... ._." ];
 
     #Messages to write when aborting a meeting
     MSG_Abort_Announcment = [ "Hey @... I'm so sorry but I have to cancel our meeting at ¤, I'm SOO sorry!",
@@ -87,12 +88,23 @@ class telecom():
                                   "You always say something random like that",
                                   "Please don't spoil that movie, I want to see it for myself!" ];
 
-    #Messages to print when a world disaster happens
+    #Messages to print when a world disaster happens. Nothing dangerous so far, hehehe... >:)
     MSG_WorldDanger_Response = [ "Aaaaah! Oh nooo!",
                                 "Whaaaaaaaaaa!! No no no no!!",
                                 "Omg, OMG NOO!",
                                 "Ooooooooooooohh!!! Ieeeeeeeeeeeeee!!",
                                 "Pwhaaa!!!"];
+
+    #Messages to print when you are filthy rich and want to get rid of it on something good or stuff from Amazon
+    MSG_MakeItRain = [ "I'm gonna donate some money to charity!",
+                      "I'm gonna buy movies from YouTube!",
+                      "I'm gonna invest in BitCoin!",
+                      "I'm gonna use some money as toilet paper",
+                      "I'm gonna donate some money to science!",
+                      "I'm gonna donate some money to a kickstarter game project",
+                      "I'll make some really fancy confetti",
+                      "I'll hide it in a treasure chest and drop the treasure map, it's gone forever!",
+                      "I'll buy some clothing for homeless people" ];
 
     #Messages to print when an AI dies
     MSG_Death_Announcement = [ "I'm sorry to announce, but it seems @ has passed away...",
@@ -157,16 +169,6 @@ class telecom():
 
         #Message for going to a meeting - WIP
         elif outMSG.msgClass == 4:
-            #outMSG.msgContent = re.sub('[@]', outMSG.msgRecieveer.m_Name, outMSG.msgContent);
-            #outMSG.msgContent = re.sub('[¤]', outMSG.msgLocation, outMSG.msgContent);
-            #outMSG.msgContent = re.sub('[§]', outMSG.msgMeetingTime, outMSG.msgContent);
-            if outMSG.msgTimer != None:
-                outMSG.msgTimer == None;
-
-            print ("[" +outMSG.msgSender.m_Name+ " SENT A MESSAGE TO " +outMSG.msgRecieveer.m_Name+ "]");
-            #print ("Message Content: " +outMSG.msgContent);
-            print ("")
-
             outMSG.msgRecieveer.m_PhoneRef.ReadMSG(outMSG);
 
         #Message for aborting a meeting - WIP
@@ -182,19 +184,7 @@ class telecom():
 
         #Message for world chaos - WIP
         elif outMSG.msgClass == 6:
-            outMSG.msgContent = re.sub('[@]', outMSG.msgRecieveer.m_Name, outMSG.msgContent);
-            outMSG.msgContent = re.sub('[¤]', outMSG.msgLocation, outMSG.msgContent);
-            outMSG.msgContent = re.sub('[§]', outMSG.msgMeetingTime, outMSG.msgContent);
-
-            if outMSG.msgTimer != None:
-                print ("Message has been set in queue and will be delivered when the time is right!");
-
-            else:
-                print ("[" +outMSG.msgSender.m_Name+ " SENT A MESSAGE TO " +outMSG.msgRecieveer.m_Name+ "]");
-                print ("Message Content: " +outMSG.msgContent);
-                print ("")
-
-                outMSG.msgRecieveer.m_PhoneRef.ReadMSG(outMSG);
+            outMSG.msgRecieveer.m_PhoneRef.ReadMSG(outMSG);
 
         #Message for announcment of an AI's death - WORKS
         elif outMSG.msgClass == 7:
@@ -203,23 +193,63 @@ class telecom():
 
     #Read a SMS
     def ReadMSG(self, inMSG):
+        #Message for asking an AI to meet up
         if inMSG.msgClass == 1:
             inMSG.msgContent = re.sub('[@]', inMSG.msgRecieveer.m_Name, inMSG.msgContent);
             inMSG.msgContent = re.sub('[¤]', inMSG.msgLocation, inMSG.msgContent);
             inMSG.msgContent = re.sub('[§]', inMSG.msgMeetingTime, inMSG.msgContent);
 
             #Check if you are avalible, respond with msgClass 2 or 3 - TWEAK VALUES
-            if inMSG.msgRecieveer.m_Energy < 20 or inMSG.msgRecieveer.m_Hunger < 20 or inMSG.msgRecieveer.m_Thirst < 20 or inMSG.msgRecieveer.m_pGoalState == State_Socialize or inMSG.msgRecieveer.m_pFutureState == State_Socialize:
+            if inMSG.msgRecieveer.m_PersonToMeet != None:
                 print (inMSG.msgRecieveer.m_Name+" can't meet up with " +inMSG.msgSender.m_Name+ "!");
-                outMSG = inMSG.msgRecieveer.m_PhoneRef.SMS.Message(self, inMSG.msgRecieveer, inMSG.msgSender, 3, telecom.MSG_DeclineMeeting_Response[randint(0, len(telecom.MSG_DeclineMeeting_Response) - 1)], inMSG.msgMeetingTime, inMSG.msgLocation, None);
+                outMSG = inMSG.msgRecieveer.m_PhoneRef.SMS().Message(inMSG.msgRecieveer, inMSG.msgSender, 3, telecom.MSG_DeclineMeeting_Response[randint(0, len(telecom.MSG_DeclineMeeting_Response) - 1)], inMSG.msgMeetingTime, inMSG.msgLocation, None);
                 inMSG.msgRecieveer.m_PhoneRef.SendMSG(outMSG);
 
             else:
                 print (inMSG.msgRecieveer.m_Name+" can meetup with " +inMSG.msgSender.m_Name+ "!");
-                outMSG = inMSG.msgRecieveer.m_PhoneRef.SMS.Message(self, inMSG.msgRecieveer, inMSG.msgSender, 2, telecom.MSG_AcceptMeeting_Response[randint(0, len(telecom.MSG_AcceptMeeting_Response) - 1)], inMSG.msgMeetingTime, inMSG.msgLocation, None);
+                outMSG = inMSG.msgRecieveer.m_PhoneRef.SMS().Message(inMSG.msgRecieveer, inMSG.msgSender, 2, telecom.MSG_AcceptMeeting_Response[randint(0, len(telecom.MSG_AcceptMeeting_Response) - 1)], inMSG.msgMeetingTime, inMSG.msgLocation, None);
                 inMSG.msgRecieveer.m_PhoneRef.SendMSG(outMSG);
+                inMSG.msgRecieveer.m_PersonToMeet = inMSG.msgSender;
 
-                #Calculate a 20 min before meetup delay of message sending
+                #Calculate a 30 min before meetup delay of message sending, message will tell if AI can still meet up
+                prepHourStr = inMSG.msgMeetingTime[0:2];
+                prepMinStr = inMSG.msgMeetingTime[3:5];
+
+                prepHourInt = int(prepHourStr);
+                prepMinInt = int(prepMinStr);
+
+                prepMinInt -= 30;
+                if prepMinInt < 0:
+                    prepMinInt += 60;
+                    prepHourInt -= 1;
+
+                if prepHourInt < 10:
+                    prepHourStr = "0" + str(prepHourInt);
+
+                else:
+                    prepHourStr = str(prepHourInt);
+
+                if prepMinInt < 10:
+                   prepMinStr = "0" + str(prepMinInt);
+
+                else:
+                    prepMinStr = str(prepMinInt);
+
+                prepFinal = prepHourStr+ ":" +prepMinStr;
+
+                outMSG = inMSG.msgRecieveer.m_PhoneRef.SMS().Message(inMSG.msgRecieveer, inMSG.msgRecieveer, 6, None, inMSG.msgMeetingTime, inMSG.msgLocation, prepFinal);
+
+                print ("Message has been set in queue and will be delivered when the time is right!");
+
+                print ("Message Sender: " +outMSG.msgSender.m_Name);
+                print ("Message Recieveer: " +outMSG.msgRecieveer.m_Name);
+                print ("Message Class: "  +str(outMSG.msgClass));
+                print ("Message Delivery Timer: " +outMSG.msgTimer);
+
+                telecom.deliveryQueue.append(outMSG);
+                inMSG.msgRecieveer.m_PersonToMeet = inMSG.msgSender;
+
+                #Calculate a 20 min before meetup delay of message sending, message will tell AI to move to location
                 prepHourStr = inMSG.msgMeetingTime[0:2];
                 prepMinStr = inMSG.msgMeetingTime[3:5];
 
@@ -245,14 +275,16 @@ class telecom():
 
                 prepFinal = prepHourStr+ ":" +prepMinStr;
 
-                delayMSG = inMSG.msgRecieveer.m_PhoneRef.SMS.Message(self, inMSG.msgRecieveer, inMSG.msgRecieveer, 4, None, inMSG.msgMeetingTime, inMSG.msgLocation, prepFinal);
+                outMSG = inMSG.msgRecieveer.m_PhoneRef.SMS().Message(inMSG.msgRecieveer, inMSG.msgRecieveer, 4, None, inMSG.msgMeetingTime, inMSG.msgLocation, prepFinal);
 
                 print ("Message has been set in queue and will be delivered when the time is right!");
-                telecom.deliveryQueue.append(delayMSG);
 
-                newStateF = State_Socialize;
-                inMSG.msgRecieveer.ChangeFutureState(newStateF);
-                inMSG.msgRecieveer.m_PersonToMeet = inMSG.msgSender;
+                print ("Message Sender: " +outMSG.msgSender.m_Name);
+                print ("Message Recieveer: " +outMSG.msgRecieveer.m_Name);
+                print ("Message Class: "  +str(outMSG.msgClass));
+                print ("Message Delivery Timer: " +outMSG.msgTimer);
+
+                telecom.deliveryQueue.append(outMSG);
 
         #Message for accepting a meeting - WIP
         elif inMSG.msgClass == 2:
@@ -260,9 +292,44 @@ class telecom():
             inMSG.msgContent = re.sub('[¤]', inMSG.msgLocation, inMSG.msgContent);
             inMSG.msgContent = re.sub('[§]', inMSG.msgMeetingTime, inMSG.msgContent);
             print (inMSG.msgRecieveer.m_Name+ ": " +telecom.MSG_Accepted_Response[randint(0, len(telecom.MSG_Accepted_Response) - 1)]);
+            inMSG.msgRecieveer.m_PersonToMeet = inMSG.msgSender;
 
-            newStateF = State_Socialize;
-            inMSG.msgRecieveer.ChangeFutureState(newStateF);
+            #Calculate a 30 min before meetup delay of message sending, message will tell if AI can still meet up
+            prepHourStr = inMSG.msgMeetingTime[0:2];
+            prepMinStr = inMSG.msgMeetingTime[3:5];
+
+            prepHourInt = int(prepHourStr);
+            prepMinInt = int(prepMinStr);
+
+            prepMinInt -= 30;
+            if prepMinInt < 0:
+                prepMinInt += 60;
+                prepHourInt -= 1;
+
+            if prepHourInt < 10:
+                prepHourStr = "0" + str(prepHourInt);
+
+            else:
+                prepHourStr = str(prepHourInt);
+
+            if prepMinInt < 10:
+                prepMinStr = "0" + str(prepMinInt);
+
+            else:
+                prepMinStr = str(prepMinInt);
+
+            prepFinal = prepHourStr+ ":" +prepMinStr;
+
+            outMSG = inMSG.msgRecieveer.m_PhoneRef.SMS().Message(inMSG.msgRecieveer, inMSG.msgRecieveer, 6, None, inMSG.msgMeetingTime, inMSG.msgLocation, prepFinal);
+
+            print ("Message has been set in queue and will be delivered when the time is right!");
+
+            print ("Message Sender: " +outMSG.msgSender.m_Name);
+            print ("Message Recieveer: " +outMSG.msgRecieveer.m_Name);
+            print ("Message Class: "  +str(outMSG.msgClass));
+            print ("Message Delivery Timer: " +outMSG.msgTimer);
+
+            telecom.deliveryQueue.append(outMSG);
             inMSG.msgRecieveer.m_PersonToMeet = inMSG.msgSender;
 
             #Calculate a 20 min before meetup delay of message sending
@@ -291,10 +358,16 @@ class telecom():
 
             prepFinal = prepHourStr+ ":" +prepMinStr;
 
-            delayMSG = inMSG.msgRecieveer.m_PhoneRef.SMS.Message(self, inMSG.msgRecieveer, inMSG.msgRecieveer, 4, None, inMSG.msgMeetingTime, inMSG.msgLocation, prepFinal);
+            outMSG = inMSG.msgRecieveer.m_PhoneRef.SMS().Message(inMSG.msgRecieveer, inMSG.msgRecieveer, 4, None, inMSG.msgMeetingTime, inMSG.msgLocation, prepFinal);
 
             print ("Message has been set in queue and will be delivered when the time is right!");
-            telecom.deliveryQueue.append(delayMSG);
+
+            print ("Message Sender: " +outMSG.msgSender.m_Name);
+            print ("Message Recieveer: " +outMSG.msgRecieveer.m_Name);
+            print ("Message Class: "  +str(outMSG.msgClass));
+            print ("Message Delivery Timer: " +outMSG.msgTimer);
+
+            telecom.deliveryQueue.append(outMSG);
 
         #Message for declining a meeting - WORKS
         elif inMSG.msgClass == 3:
@@ -303,30 +376,46 @@ class telecom():
 
         #Message for prepare to go to meeting - WIP
         elif inMSG.msgClass == 4:
-            if inMSG.msgRecieveer.m_pFutureState == State_Socialize and inMSG.msgRecieveer.m_PersonToMeet != None:
+            if inMSG.msgRecieveer.m_PersonToMeet != None:
                 #Stop what you are doing and goto meeting spot
                 print (inMSG.msgRecieveer.m_Name+ ": I have to go now!");
-                newStateG = inMSG.msgRecieveer.m_pFutureState;
+                newStateG = State_Socialize;
                 inMSG.msgRecieveer.ChangeGoalState(newStateG);
                 inMSG.msgRecieveer.m_GoalLoc = inMSG.msgLocation;
-                inMSG.msgRecieveer.m_pCurrentState.Exit(inMSG.msgRecieveer);
+                newStateC = State_WalkTo;
+                inMSG.msgRecieveer.ChangeCurrentState(newStateC);
 
             else:
-                print (inMSG.msgRecieveer.m_Name+ ": Message is no longer relevant");
+                print (inMSG.msgRecieveer.m_Name+ ": Message is no longer relevant, meeting was disbanded");
 
         #Message for aborting meeting - WIP
         elif inMSG.msgClass == 5:
-            newStateG = None;
-            inMSG.recieveer.ChangeFutureState(newStateG);
-            inMSG.recieveer.m_PersonToMeet = None;
+            inMSG.msgRecieveer.m_PersonToMeet = None;
             print (inMSG.msgRecieveer.m_Name+ ": " +telecom.MSG_Declined_Response[randint(0, len(telecom.MSG_Declined_Response) - 1)]);
 
-        #Message for apocalyptic messages
+        #Message for validating meeting propability
         elif inMSG.msgClass == 6:
-            #SCREAM IN FEAR
-            print (inMSG.msgRecieveer.m_Name+ ": " +telecom.MSG_WorldDanger_Response[randint(0, len(telecom.MSG_WorldDanger_Response) - 1)]);
+            if inMSG.msgRecieveer.m_Thirst < 40 or inMSG.msgRecieveer.m_Hunger < 40 or inMSG.msgRecieveer.m_Energy < 40:
+                if inMSG.msgRecieveer.m_PersonToMeet != None:
+                    print (inMSG.msgRecieveer.m_Name+" can't meet up with " +inMSG.msgRecieveer.m_PersonToMeet.m_Name+ "!");
+                    outMSG = inMSG.msgRecieveer.m_PhoneRef.SMS().Message(inMSG.msgRecieveer, inMSG.msgRecieveer.m_PersonToMeet, 5, telecom.MSG_DeclineMeeting_Response[randint(0, len(telecom.MSG_DeclineMeeting_Response) - 1)], inMSG.msgMeetingTime, inMSG.msgLocation, None);
+                    inMSG.msgRecieveer.m_PhoneRef.SendMSG(outMSG);
+                    inMSG.msgRecieveer.m_PersonToMeet = None;
+                else:
+                    print (inMSG.msgRecieveer.m_Name+" can't go to the meeting, it might been cancelled already!");
+
+            elif inMSG.msgRecieveer.m_Alive == False:
+                print (inMSG.msgRecieveer.m_Name+ " is dead, can't deal with this");
+
+            else:
+                print (inMSG.msgRecieveer.m_Name+ ": I can still meet my friend in a little while!");
 
         #Message for the passing of AI's
         elif inMSG.msgClass == 7:
             #Cry in sadness
             print (inMSG.msgRecieveer.m_Name+ ": " +telecom.MSG_Grief_Response[randint(0, len(telecom.MSG_Grief_Response) - 1)]);
+
+            #Check if AI had a meeting with desceased AI
+            if inMSG.msgRecieveer.m_PersonToMeet == inMSG.msgSender:
+                print (inMSG.msgRecieveer.m_Name+ ": We were going to meet later, I guess that's not happening ;_;");
+                inMSG.msgRecieveer.m_PersonToMeet = None;

@@ -1,6 +1,6 @@
 class gameTime():
 
-    updateRate = 0.000001;
+    updateRate = 0.000000000000000001;
 
     calHour = 0;
     calMin = 0;
