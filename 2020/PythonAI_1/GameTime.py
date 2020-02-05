@@ -1,7 +1,5 @@
+# JONAS H, Februari 2020
 class gameTime():
-
-    updateRate = 0.000000000000000001;
-
     calHour = 0;
     calMin = 0;
     calDays = 0;
@@ -11,11 +9,6 @@ class gameTime():
     cHour = None;
     cMin = None;
     cTime = None;
-
-    #Adjust updateRate during runtime
-    def ChangeUR(self, float):
-        global updateRate
-        self.updateRate = float;
 
     #Update clock system
     def Update(self):
@@ -66,4 +59,3 @@ class gameTime():
         global cTime
         self.cTime = self.cHour+ ":" +self.cMin;
         return self.cTime;
-        #COMPLETE, DO NOT TOUCH
