@@ -11,6 +11,7 @@
     <OutputPath>.</OutputPath>
     <Name>PythonAI_1</Name>
     <RootNamespace>PythonAI_1</RootNamespace>
+    <PublishUrl>C:\Users\Nacke\OneDrive\Dokument\UniversityGIT\AI_S0006D\2020\Release</PublishUrl>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
