@@ -38,7 +38,7 @@ class telecom():
         MSG_DeclineMeeting = 3; #Sent to another AI for confirmation of meeting
         MSG_GotoMeeting = 4; #Sent to yourself for reminder of going to meeting
         MSG_AbortMeeting = 5; #Sent to another AI to abort planned meeting if anything happens
-        MSG_ValidateMeetinProp = 6; #Sent to AI's with planned meeting to see if they can still go
+        MSG_ValidateMeeting = 6; #Sent to AI's with planned meeting to see if they can still go
         MSG_Grief = 7; #Sent to all AIs to confirm that something terrible has happend
 
     phoneBook = [];
